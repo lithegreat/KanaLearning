@@ -4,6 +4,7 @@ obj/
 
 # Publish/package artifacts
 publish*/
+artifacts/
 *.zip
 
 # Logs
