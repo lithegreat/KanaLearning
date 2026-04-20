@@ -55,6 +55,9 @@ public partial class QuizViewModel : ObservableObject
     private string _feedbackMessage = string.Empty;
 
     [ObservableProperty]
+    private string _bankFeedbackMessage = string.Empty;
+
+    [ObservableProperty]
     private string _userAnswer = string.Empty;
 
     [ObservableProperty]
@@ -202,7 +205,7 @@ public partial class QuizViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(ManualKana) || string.IsNullOrWhiteSpace(ManualRomaji))
         {
-            FeedbackMessage = _localizationService.GetString("Quiz.Feedback.InvalidManualInput");
+            BankFeedbackMessage = _localizationService.GetString("Quiz.Feedback.InvalidManualInput");
             return;
         }
 
@@ -218,14 +221,14 @@ public partial class QuizViewModel : ObservableObject
                 string.Equals(q.Kana, newQuestion.Kana, StringComparison.Ordinal) &&
                 string.Equals(q.Romaji, newQuestion.Romaji, StringComparison.OrdinalIgnoreCase)))
         {
-            FeedbackMessage = _localizationService.GetString("Quiz.Feedback.Duplicate");
+            BankFeedbackMessage = _localizationService.GetString("Quiz.Feedback.Duplicate");
             return;
         }
 
         _allQuestions.Add(newQuestion);
         ManualKana = string.Empty;
         ManualRomaji = string.Empty;
-        FeedbackMessage = _localizationService.GetString("Quiz.Feedback.ManualAdded");
+        BankFeedbackMessage = _localizationService.GetString("Quiz.Feedback.ManualAdded");
         SelectNextQuestion();
         OnPropertyChanged(nameof(FilteredCountText));
     }
@@ -245,7 +248,7 @@ public partial class QuizViewModel : ObservableObject
 
         if (result.Questions.Count == 0)
         {
-            FeedbackMessage = result.Errors.Count > 0
+            BankFeedbackMessage = result.Errors.Count > 0
                 ? result.Errors[0]
                 : _localizationService.GetString("Quiz.Feedback.ImportEmpty");
             return;
@@ -267,11 +270,11 @@ public partial class QuizViewModel : ObservableObject
 
         if (added == 0)
         {
-            FeedbackMessage = _localizationService.GetString("Quiz.Feedback.DuplicateImport");
+            BankFeedbackMessage = _localizationService.GetString("Quiz.Feedback.DuplicateImport");
             return;
         }
 
-        FeedbackMessage = string.Format(_localizationService.GetString("Quiz.Feedback.ImportSuccess"), added);
+        BankFeedbackMessage = string.Format(_localizationService.GetString("Quiz.Feedback.ImportSuccess"), added);
         SelectNextQuestion();
         OnPropertyChanged(nameof(FilteredCountText));
     }
