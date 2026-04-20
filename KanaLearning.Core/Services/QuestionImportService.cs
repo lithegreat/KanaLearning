@@ -73,7 +73,20 @@ public sealed class QuestionImportService : IQuestionImportService
                     continue;
                 }
 
-                KanaCategory category = ParseCategory(rawQuestion.Category, rawQuestion.Kana);
+                string? categoryStr = null;
+                if (rawQuestion.Category.HasValue)
+                {
+                    if (rawQuestion.Category.Value.ValueKind == JsonValueKind.String)
+                    {
+                        categoryStr = rawQuestion.Category.Value.GetString();
+                    }
+                    else if (rawQuestion.Category.Value.ValueKind == JsonValueKind.Number)
+                    {
+                        categoryStr = rawQuestion.Category.Value.GetInt32().ToString();
+                    }
+                }
+
+                KanaCategory category = ParseCategory(categoryStr, rawQuestion.Kana);
                 result.Questions.Add(new KanaQuestion
                 {
                     Kana = rawQuestion.Kana.Trim(),
@@ -82,9 +95,9 @@ public sealed class QuestionImportService : IQuestionImportService
                 });
             }
         }
-        catch (JsonException)
+        catch (JsonException ex)
         {
-            result.Errors.Add("Invalid JSON format.");
+            result.Errors.Add($"Invalid JSON format: {ex.Message}");
         }
         catch (IOException)
         {
@@ -206,6 +219,6 @@ public sealed class QuestionImportService : IQuestionImportService
 
         public string Romaji { get; set; } = string.Empty;
 
-        public string? Category { get; set; }
+        public JsonElement? Category { get; set; }
     }
 }
