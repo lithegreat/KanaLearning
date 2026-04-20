@@ -40,13 +40,13 @@ jobs:
             nuget-${{ runner.os }}-
 
       - name: Restore tests
-        run: dotnet restore .\KanaLearning.Tests\KanaLearning.Tests.csproj -p:PublishProfile= -p:EnableMsixTooling=false --nologo
+        run: dotnet restore .\KanaLearning.Tests\KanaLearning.Tests.csproj -p:DisablePackagingForTestBuild=true -p:PublishProfile= -p:EnableMsixTooling=false --nologo
 
       - name: Build tests (Debug x64)
-        run: dotnet build .\KanaLearning.Tests\KanaLearning.Tests.csproj -c Debug -p:Platform=x64 -p:PublishProfile= -p:EnableMsixTooling=false --no-restore --nologo
+        run: dotnet build .\KanaLearning.Tests\KanaLearning.Tests.csproj -c Debug -p:Platform=x64 -p:DisablePackagingForTestBuild=true -p:PublishProfile= -p:EnableMsixTooling=false --no-restore --nologo
 
       - name: Run tests (Debug x64)
-        run: dotnet test .\KanaLearning.Tests\KanaLearning.Tests.csproj -c Debug -p:Platform=x64 -p:PublishProfile= -p:EnableMsixTooling=false --no-build --verbosity minimal --nologo
+        run: dotnet test .\KanaLearning.Tests\KanaLearning.Tests.csproj -c Debug -p:Platform=x64 -p:DisablePackagingForTestBuild=true -p:PublishProfile= -p:EnableMsixTooling=false --no-build --verbosity minimal --nologo
 
       - name: Upload optional PDB artifact
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_pdb_artifact == 'true' }}
