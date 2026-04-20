@@ -8,14 +8,30 @@ namespace KanaLearning.ViewModels;
 public partial class SettingsViewModel : ObservableObject
 {
     private readonly ILocalizationService _localizationService;
+    private readonly LanguageOption _systemOption;
+    private readonly LanguageOption _zhCnOption;
+    private readonly LanguageOption _enUsOption;
+    private bool _isUpdating;
 
     public SettingsViewModel(ILocalizationService localizationService)
     {
         _localizationService = localizationService;
-        _localizationService.LanguageChanged += OnLanguageChanged;
 
-        LanguageOptions = new ObservableCollection<LanguageOption>();
-        RebuildLanguageOptions();
+        _systemOption = new LanguageOption { Code = "system", DisplayName = string.Empty };
+        _zhCnOption = new LanguageOption { Code = "zh-CN", DisplayName = string.Empty };
+        _enUsOption = new LanguageOption { Code = "en-US", DisplayName = string.Empty };
+
+        LanguageOptions = new ObservableCollection<LanguageOption>
+        {
+            _systemOption,
+            _zhCnOption,
+            _enUsOption,
+        };
+
+        RefreshDisplayNames();
+        SyncSelectedLanguage();
+
+        _localizationService.LanguageChanged += OnLanguageChanged;
     }
 
     public ObservableCollection<LanguageOption> LanguageOptions { get; }
@@ -31,7 +47,7 @@ public partial class SettingsViewModel : ObservableObject
 
     partial void OnSelectedLanguageChanged(LanguageOption? value)
     {
-        if (value is null)
+        if (_isUpdating || value is null)
         {
             return;
         }
@@ -47,30 +63,32 @@ public partial class SettingsViewModel : ObservableObject
 
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
-        RebuildLanguageOptions();
-        OnPropertyChanged(string.Empty);
+        _isUpdating = true;
+        try
+        {
+            RefreshDisplayNames();
+            SyncSelectedLanguage();
+
+            OnPropertyChanged(nameof(TitleText));
+            OnPropertyChanged(nameof(LanguageText));
+            OnPropertyChanged(nameof(DescriptionText));
+        }
+        finally
+        {
+            _isUpdating = false;
+        }
     }
 
-    private void RebuildLanguageOptions()
+    private void RefreshDisplayNames()
+    {
+        _systemOption.DisplayName = _localizationService.GetString("Settings.Language.System");
+        _zhCnOption.DisplayName = _localizationService.GetString("Settings.Language.ZhCn");
+        _enUsOption.DisplayName = _localizationService.GetString("Settings.Language.EnUs");
+    }
+
+    private void SyncSelectedLanguage()
     {
         string currentCode = _localizationService.CurrentLanguageCode;
-
-        LanguageOptions.Clear();
-        LanguageOptions.Add(new LanguageOption
-        {
-            Code = "system",
-            DisplayName = _localizationService.GetString("Settings.Language.System"),
-        });
-        LanguageOptions.Add(new LanguageOption
-        {
-            Code = "zh-CN",
-            DisplayName = _localizationService.GetString("Settings.Language.ZhCn"),
-        });
-        LanguageOptions.Add(new LanguageOption
-        {
-            Code = "en-US",
-            DisplayName = _localizationService.GetString("Settings.Language.EnUs"),
-        });
 
         foreach (LanguageOption option in LanguageOptions)
         {
@@ -81,6 +99,7 @@ public partial class SettingsViewModel : ObservableObject
             }
         }
 
-        SelectedLanguage = LanguageOptions[0];
+        SelectedLanguage = _systemOption;
     }
 }
+
