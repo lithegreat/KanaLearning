@@ -65,6 +65,34 @@ $Platform = if ($env:PROCESSOR_ARCHITECTURE -eq 'AMD64') { 'x64' } elseif ($env:
 dotnet test .\KanaLearning.Tests\KanaLearning.Tests.csproj -c Debug -p:Platform=$Platform
 ```
 
+## CI/CD (GitHub Actions)
+
+This repository includes two workflows:
+
+- `CI` (`.github/workflows/ci.yml`)
+  - Trigger: push to `main`, pull request to `main`, or manual run.
+  - Actions: restore, build (Debug x64), and run unit tests.
+- `Release` (`.github/workflows/release.yml`)
+  - Trigger: push tags matching `v*` (for example `v0.2.0`) or manual run.
+  - Actions: restore, build (Release x64), run tests, publish win-x64 package, zip artifact, create/update GitHub Release.
+
+### Create a Release
+
+From project root:
+
+```powershell
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+After tag push, GitHub Actions will automatically publish a release and upload:
+
+- `KanaLearning-win-x64-v0.2.0.zip`
+
+### Runtime Prerequisite
+
+The packaged app targets Windows x64. On target machines, install Windows App SDK Runtime if the app does not launch.
+
 ## Project Structure
 
 - `Models`: quiz entities and import result.
