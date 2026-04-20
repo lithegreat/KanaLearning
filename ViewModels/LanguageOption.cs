@@ -7,5 +7,5 @@ public sealed partial class LanguageOption : ObservableObject
     public required string Code { get; init; }
 
     [ObservableProperty]
-    private string _displayName = string.Empty;
+    public partial string DisplayName { get; set; } = string.Empty;
 }
