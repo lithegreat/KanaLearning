@@ -1,103 +1,60 @@
 # KanaLearning
 
-KanaLearning is a WinUI 3 desktop app built with Windows App SDK and MVVM (CommunityToolkit.Mvvm).
-It runs as an unpackaged app and supports kana-to-romaji practice with bilingual UI (Chinese/English).
+KanaLearning is a desktop app for practicing kana to romaji typing.
+It supports Chinese and English UI and runs as a portable app on Windows x64.
 
-## Features
+## What You Can Do
 
-- Quiz mode: app shows kana, user inputs romaji, instant feedback.
-- Kana coverage: hiragana, katakana, dakuten/handakuten, yoon.
-- Strict answer matching: compares normalized romaji (trim + case-insensitive).
-- Data input:
-  - Built-in default kana dataset.
-  - Import JSON or TXT files.
-  - Manual single-question input.
-- Language:
-  - Default follows system language.
-  - In-app switch between Chinese and English.
+- Practice kana questions with instant right/wrong feedback.
+- Cover hiragana, katakana, dakuten/handakuten, and yoon.
+- Import your own questions from TXT or JSON files.
+- Add a single question manually.
+- Switch UI language between Chinese and English.
 
-## Tech Stack
+## Quick Start
 
-- WinUI 3 + Windows App SDK
-- MVVM with CommunityToolkit.Mvvm
-- .NET 10 Windows target
+1. Go to GitHub Releases and download the latest zip package.
+2. Extract the zip.
+3. Run KanaLearning.exe.
 
-## Input File Formats
+No installer is required.
 
-### TXT
+## How To Use
 
-- `kana=romaji`
-- `kana,romaji`
-- Empty lines and lines starting with `#` are ignored.
+1. Start the app and choose quiz mode.
+2. Enter the romaji for the kana shown.
+3. Submit to get instant feedback.
+4. Continue to the next question.
+5. Open settings to switch language if needed.
 
-Examples:
+## Import File Format
 
-```txt
+TXT format (one question per line):
+
+- kana=romaji
+- kana,romaji
+- Empty lines and lines starting with # are ignored.
+
+Example:
+
 あ=a
 ガ=ga
 きゃ=kya
-```
 
-### JSON
+JSON format:
 
-Array of objects with `kana`, `romaji`, optional `category`.
+- Use an array of objects.
+- Required fields: kana, romaji.
+- Optional field: category.
 
-```json
+Example:
+
 [
   { "kana": "カ", "romaji": "ka", "category": "Katakana" },
   { "kana": "ぴ", "romaji": "pi", "category": "DakutenHandakuten" }
 ]
-```
 
-## Build
+## Notes
 
-From project root:
-
-```powershell
-$Platform = if ($env:PROCESSOR_ARCHITECTURE -eq 'AMD64') { 'x64' } elseif ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'ARM64' } else { 'x86' }
-dotnet build .\KanaLearning.csproj -c Debug -p:Platform=$Platform
-```
-
-## Run Tests
-
-```powershell
-$Platform = if ($env:PROCESSOR_ARCHITECTURE -eq 'AMD64') { 'x64' } elseif ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'ARM64' } else { 'x86' }
-dotnet test .\KanaLearning.Tests\KanaLearning.Tests.csproj -c Debug -p:Platform=$Platform
-```
-
-## CI/CD (GitHub Actions)
-
-This repository includes two workflows:
-
-- `CI` (`.github/workflows/ci.yml`)
-  - Trigger: push to `main`, pull request to `main`, or manual run.
-  - Actions: restore, build (Debug x64), and run unit tests.
-- `Release` (`.github/workflows/release.yml`)
-  - Trigger: push tags matching `v*` (for example `v0.2.0`) or manual run.
-  - Actions: restore, build (Release x64), run tests, publish win-x64 package, zip artifact, create/update GitHub Release.
-
-### Create a Release
-
-From project root:
-
-```powershell
-git tag v0.2.0
-git push origin v0.2.0
-```
-
-After tag push, GitHub Actions will automatically publish a release and upload:
-
-- `KanaLearning-win-x64-v0.2.0.zip`
-
-### Runtime Prerequisite
-
-The packaged app targets Windows x64. On target machines, install Windows App SDK Runtime if the app does not launch.
-
-## Project Structure
-
-- `Models`: quiz entities and import result.
-- `Services`: localization, question import, answer evaluation.
-- `ViewModels`: quiz/session state and settings state.
-- `Views`: quiz page and settings page.
-- `Resources/Localization`: language JSON files.
-- `Resources/Kana`: built-in default kana dataset.
+- Target platform: Windows x64.
+- If launch is blocked by system security, right-click the file and allow run.
