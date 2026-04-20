@@ -7,10 +7,11 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x86;x64;ARM64</Platforms>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
+    <PublishProfile Condition="'$(DisablePackagingForTestBuild)' != 'true'">win-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
     <WinUISDKReferences>false</WinUISDKReferences>
-    <EnableMsixTooling>true</EnableMsixTooling>
+    <EnableMsixTooling Condition="'$(DisablePackagingForTestBuild)' != 'true'">true</EnableMsixTooling>
+    <EnableMsixTooling Condition="'$(DisablePackagingForTestBuild)' == 'true'">false</EnableMsixTooling>
     <WindowsPackageType>None</WindowsPackageType>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -40,6 +41,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="KanaLearning.Core\KanaLearning.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="*" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="*" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="*" />
@@ -55,10 +60,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="KanaLearning.Core\**\*.cs" />
+    <None Remove="KanaLearning.Core\**\*" />
+    <Content Remove="KanaLearning.Core\**\*" />
+
     <Compile Remove="KanaLearning.Tests\**\*.cs" />
     <None Remove="KanaLearning.Tests\**\*" />
     <Page Remove="KanaLearning.Tests\**\*.xaml" />
     <EmbeddedResource Remove="KanaLearning.Tests\**\*" />
+
+    <!-- Exclude Models/Services source files — they come from KanaLearning.Core via ProjectReference -->
+    <Compile Remove="Models\**\*.cs" />
+    <Compile Remove="Services\**\*.cs" />
 
     <!-- Prevent local publish artifacts from being included in app publish outputs -->
     <Compile Remove="publish*\**\*" />

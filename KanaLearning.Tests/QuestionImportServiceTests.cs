@@ -23,11 +23,11 @@ public sealed class QuestionImportServiceTests
 
             ImportResult result = await service.ImportFromPathAsync(path);
 
-            Assert.AreEqual(3, result.Questions.Count);
+            Assert.HasCount(3, result.Questions);
             Assert.AreEqual(KanaCategory.Hiragana, result.Questions[0].Category);
             Assert.AreEqual(KanaCategory.DakutenHandakuten, result.Questions[1].Category);
             Assert.AreEqual(KanaCategory.Yoon, result.Questions[2].Category);
-            Assert.AreEqual(0, result.Errors.Count);
+            Assert.IsEmpty(result.Errors);
         }
         finally
         {
@@ -56,10 +56,10 @@ public sealed class QuestionImportServiceTests
 
             ImportResult result = await service.ImportFromPathAsync(path);
 
-            Assert.AreEqual(2, result.Questions.Count);
+            Assert.HasCount(2, result.Questions);
             Assert.AreEqual(KanaCategory.Katakana, result.Questions[0].Category);
             Assert.AreEqual("pi", result.Questions[1].Romaji);
-            Assert.AreEqual(0, result.Errors.Count);
+            Assert.IsEmpty(result.Errors);
         }
         finally
         {
@@ -82,8 +82,8 @@ public sealed class QuestionImportServiceTests
 
             ImportResult result = await service.ImportFromPathAsync(path);
 
-            Assert.AreEqual(0, result.Questions.Count);
-            Assert.AreEqual(1, result.Errors.Count);
+            Assert.IsEmpty(result.Questions);
+            Assert.HasCount(1, result.Errors);
             Assert.AreEqual("Unsupported file type.", result.Errors[0]);
         }
         finally

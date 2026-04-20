@@ -31,8 +31,11 @@ jobs:
         run: |
           $version = "${{ github.ref_name }}"
           $zipName = "KanaLearning-win-x64-$version.zip"
+          # Tags with a suffix (for example v1.2.0-rc.1, v1.2.0-beta.1) are treated as pre-releases.
+          $isPreRelease = if ($version -match '-') { 'true' } else { 'false' }
           "version=$version" >> $env:GITHUB_OUTPUT
           "zip_name=$zipName" >> $env:GITHUB_OUTPUT
+          "is_prerelease=$isPreRelease" >> $env:GITHUB_OUTPUT
 
       - name: Restore app
         run: dotnet restore .\KanaLearning.csproj
@@ -98,6 +101,7 @@ jobs:
         with:
           tag_name: ${{ steps.vars.outputs.version }}
           name: KanaLearning ${{ steps.vars.outputs.version }}
+          prerelease: ${{ steps.vars.outputs.is_prerelease }}
           generate_release_notes: true
           files: .\artifacts\release\${{ steps.vars.outputs.zip_name }}
           append_body: true

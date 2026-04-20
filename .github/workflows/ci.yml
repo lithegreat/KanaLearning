@@ -31,17 +31,22 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Restore app
-        run: dotnet restore .\KanaLearning.csproj
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'NuGet.config') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
-      - name: Restore tests
-        run: dotnet restore .\KanaLearning.Tests\KanaLearning.Tests.csproj
+      - name: Restore
+        run: dotnet restore .\KanaLearning.Tests\KanaLearning.Tests.csproj --nologo
 
-      - name: Build app (Debug x64)
-        run: dotnet build .\KanaLearning.csproj -c Debug -p:Platform=x64 --no-restore
+      - name: Build tests
+        run: dotnet build .\KanaLearning.Tests\KanaLearning.Tests.csproj -c Debug --no-restore --nologo
 
-      - name: Run tests (Debug x64)
-        run: dotnet test .\KanaLearning.Tests\KanaLearning.Tests.csproj -c Debug -p:Platform=x64 --verbosity normal
+      - name: Run tests
+        run: dotnet test .\KanaLearning.Tests\KanaLearning.Tests.csproj -c Debug --no-build --nologo
 
       - name: Upload optional PDB artifact
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_pdb_artifact == 'true' }}
