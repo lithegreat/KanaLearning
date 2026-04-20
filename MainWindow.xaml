@@ -14,7 +14,6 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -24,11 +23,20 @@
             </TitleBar.IconSource>
         </TitleBar>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Padding="12,8">
-            <Button x:Name="QuizNavButton" Click="OnQuizNavButtonClick" />
-            <Button x:Name="SettingsNavButton" Click="OnSettingsNavButtonClick" />
-        </StackPanel>
-
-        <Frame x:Name="ContentFrame" Grid.Row="2" />
+        <NavigationView x:Name="NavView"
+                        Grid.Row="1"
+                        IsBackButtonVisible="Collapsed"
+                        IsSettingsVisible="False"
+                        PaneDisplayMode="Left"
+                        ItemInvoked="OnNavItemInvoked">
+            <NavigationView.MenuItems>
+                <NavigationViewItem x:Name="QuizNavButton" Icon="Edit" />
+            </NavigationView.MenuItems>
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem x:Name="SettingsNavButton" Icon="Setting" />
+            </NavigationView.FooterMenuItems>
+            
+            <Frame x:Name="ContentFrame" />
+        </NavigationView>
     </Grid>
 </Window>
