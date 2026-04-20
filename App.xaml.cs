@@ -1,5 +1,6 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using KanaLearning.Services;
+using KanaLearning.UIServices;
 using KanaLearning.ViewModels;
 
 namespace KanaLearning;
@@ -20,6 +21,8 @@ public partial class App : Application
 
     public SettingsViewModel SettingsViewModel { get; }
 
+    public ThemeService ThemeService { get; }
+
     public Window MainWindow { get; private set; } = null!;
 
     public App()
@@ -29,15 +32,19 @@ public partial class App : Application
         LocalizationService = new LocalizationService();
         QuestionImportService = new QuestionImportService();
         QuizEvaluationService = new QuizEvaluationService();
+        ThemeService = new ThemeService();
 
         QuizViewModel = new QuizViewModel(LocalizationService, QuestionImportService, QuizEvaluationService);
-        SettingsViewModel = new SettingsViewModel(LocalizationService);
+        SettingsViewModel = new SettingsViewModel(LocalizationService, ThemeService);
     }
 
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         _window = new MainWindow(QuizViewModel, SettingsViewModel, LocalizationService);
         MainWindow = _window;
+        
+        ThemeService.Initialize();
+        
         _window.Activate();
     }
 }

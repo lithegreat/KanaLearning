@@ -41,6 +41,10 @@
   "Settings.Language": "Language",
   "Settings.Description": "UI language defaults to system language. You can switch here.",
   "Settings.Language.System": "Follow system language",
-  "Settings.Language.ZhCn": "Chinese (Simplified)",
-  "Settings.Language.EnUs": "English (US)"
+  "Settings.Language.ZhCn": "简体中文",
+  "Settings.Language.EnUs": "English (US)",
+  "Settings.Theme": "Theme",
+  "Settings.Theme.System": "Follow System",
+  "Settings.Theme.Light": "Light",
+  "Settings.Theme.Dark": "Dark"
 }
