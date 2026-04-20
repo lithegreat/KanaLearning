@@ -20,7 +20,7 @@
                 
                 <TextBlock FontSize="64" Text="{Binding CurrentKanaText}" HorizontalAlignment="Center" Margin="0,16" />
                 
-                <TextBox Header="{Binding AnswerLabelText}" Text="{Binding UserAnswer, Mode=TwoWay}" PlaceholderText="{Binding AnswerPlaceholderText}" />
+                <TextBox Header="{Binding AnswerLabelText}" Text="{Binding UserAnswer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{Binding AnswerPlaceholderText}" KeyDown="OnAnswerTextBoxKeyDown" />
                 
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Button Command="{Binding SubmitAnswerCommand}" Content="{Binding SubmitButtonText}" Style="{StaticResource AccentButtonStyle}" />
@@ -41,7 +41,6 @@
                 <Grid RowSpacing="8" ColumnSpacing="16">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -49,8 +48,6 @@
                     </Grid.ColumnDefinitions>
                     <CheckBox Grid.Row="0" Grid.Column="0" Content="{Binding FilterHiraganaText}" IsChecked="{Binding IncludeHiragana, Mode=TwoWay}" />
                     <CheckBox Grid.Row="0" Grid.Column="1" Content="{Binding FilterKatakanaText}" IsChecked="{Binding IncludeKatakana, Mode=TwoWay}" />
-                    <CheckBox Grid.Row="1" Grid.Column="0" Content="{Binding FilterDakutenText}" IsChecked="{Binding IncludeDakutenHandakuten, Mode=TwoWay}" />
-                    <CheckBox Grid.Row="1" Grid.Column="1" Content="{Binding FilterYoonText}" IsChecked="{Binding IncludeYoon, Mode=TwoWay}" />
                 </Grid>
                 <TextBlock Text="{Binding FilteredCountText}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
@@ -76,8 +73,7 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
                 
-                <TextBox Header="{Binding ManualKanaLabelText}" Text="{Binding ManualKana, Mode=TwoWay}" />
-                <TextBox Header="{Binding ManualRomajiLabelText}" Text="{Binding ManualRomaji, Mode=TwoWay}" />
+                <TextBox Header="{Binding ManualKanaLabelText}" Text="{Binding ManualKana, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" KeyDown="OnManualKanaTextBoxKeyDown" />
                 <Button Command="{Binding AddQuestionCommand}" Content="{Binding AddButtonText}" HorizontalAlignment="Stretch" Style="{StaticResource AccentButtonStyle}" />
                 <TextBlock Text="{Binding BankFeedbackMessage}" TextWrapping="Wrap" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
             </StackPanel>
