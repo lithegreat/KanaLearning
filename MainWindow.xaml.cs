@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Controls;
 using KanaLearning.Services;
 using KanaLearning.ViewModels;
 using KanaLearning.Views;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace KanaLearning;
 
@@ -39,10 +40,15 @@ public sealed partial class MainWindow : Window
         NavView.SelectedItem = QuizNavButton;
         ContentFrame.Navigate(typeof(QuizPage), _quizViewModel);
         
-        CheckForUpdatesAsync();
+        WeakReferenceMessenger.Default.Register<KanaLearning.Messages.CheckForUpdateMessage>(this, (r, m) => 
+        {
+            CheckForUpdatesAsync(showUpToDatePrompt: true);
+        });
+
+        CheckForUpdatesAsync(showUpToDatePrompt: false);
     }
 
-    private async void CheckForUpdatesAsync()
+    private async void CheckForUpdatesAsync(bool showUpToDatePrompt)
     {
         try
         {
@@ -73,7 +79,14 @@ public sealed partial class MainWindow : Window
 
             DispatcherQueue.TryEnqueue(() =>
             {
-                AutoUpdater.ParseUpdateInfoEvent += (args) =>
+                // Ensure we don't attach multiple times
+                AutoUpdater.ParseUpdateInfoEvent -= AutoUpdaterOnParseUpdateInfoEvent;
+                AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
+
+                AutoUpdater.CheckForUpdateEvent -= AutoUpdaterOnCheckForUpdateEvent;
+                AutoUpdater.CheckForUpdateEvent += AutoUpdaterOnCheckForUpdateEvent;
+
+                void AutoUpdaterOnParseUpdateInfoEvent(ParseUpdateInfoEventArgs args)
                 {
                     args.UpdateInfo = new UpdateInfoEventArgs
                     {
@@ -87,15 +100,19 @@ public sealed partial class MainWindow : Window
                             MinimumVersion = "0.0.0.0"
                         }
                     };
-                };
+                }
 
-                AutoUpdater.CheckForUpdateEvent += async (args) =>
+                async void AutoUpdaterOnCheckForUpdateEvent(UpdateInfoEventArgs args)
                 {
+                    // Clean up handlers so they don't fire again for other triggers
+                    AutoUpdater.ParseUpdateInfoEvent -= AutoUpdaterOnParseUpdateInfoEvent;
+                    AutoUpdater.CheckForUpdateEvent -= AutoUpdaterOnCheckForUpdateEvent;
+
                     if (args.Error == null && args.IsUpdateAvailable)
                     {
                         var dialog = new ContentDialog
                         {
-                            Title = "Update Available",
+                            Title = _localizationService.GetString("Settings.UpdateAvailable.Title") ?? "Update Available",
                             Content = $"A new version ({args.CurrentVersion}) is available.\n\nCurrent version: {args.InstalledVersion}\n\nDo you want to update now?",
                             PrimaryButtonText = "Update",
                             CloseButtonText = "Later",
@@ -115,7 +132,35 @@ public sealed partial class MainWindow : Window
                             }
                         }
                     }
-                };
+                    else if (showUpToDatePrompt && args.Error == null && !args.IsUpdateAvailable)
+                    {
+                        var dialog = new ContentDialog
+                        {
+                            Title = _localizationService.GetString("Settings.UpToDate.Title") ?? "Up to date",
+                            Content = $"You are already using the latest version ({args.InstalledVersion}).",
+                            CloseButtonText = "OK",
+                            XamlRoot = this.Content.XamlRoot
+                        };
+                        await dialog.ShowAsync();
+                    }
+                }
+
+                try
+                {
+                    var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+                    if (!string.IsNullOrEmpty(exePath))
+                    {
+                        var versionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(exePath);
+                        if (Version.TryParse(versionInfo.FileVersion, out var fileVersion))
+                        {
+                            AutoUpdater.InstalledVersion = fileVersion;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignore version extraction errors
+                }
 
                 AutoUpdater.Start(tempFilePath);
             });

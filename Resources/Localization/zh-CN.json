@@ -42,5 +42,8 @@
   "Settings.Theme": "主题",
   "Settings.Theme.System": "跟随系统",
   "Settings.Theme.Light": "浅色",
-  "Settings.Theme.Dark": "深色"
+  "Settings.Theme.Dark": "深色",
+  "Settings.Update": "检查更新",
+  "Settings.UpdateAvailable.Title": "发现新版本",
+  "Settings.UpToDate.Title": "已是最新版本"
 }

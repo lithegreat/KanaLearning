@@ -42,5 +42,8 @@
   "Settings.Theme": "Theme",
   "Settings.Theme.System": "Follow System",
   "Settings.Theme.Light": "Light",
-  "Settings.Theme.Dark": "Dark"
+  "Settings.Theme.Dark": "Dark",
+  "Settings.Update": "Check for updates",
+  "Settings.UpdateAvailable.Title": "Update Available",
+  "Settings.UpToDate.Title": "Up to date"
 }

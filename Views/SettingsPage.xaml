@@ -35,5 +35,12 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
+
+        <Button Margin="0,12,0,0" Command="{Binding CheckForUpdatesCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon Glyph="&#xE895;" FontSize="16" />
+                <TextBlock Text="{Binding UpdateText}" />
+            </StackPanel>
+        </Button>
     </StackPanel>
 </Page>
