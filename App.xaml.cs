@@ -14,6 +14,7 @@ public partial class App : Application
     public LocalizationService LocalizationService { get; }
 
     public QuestionImportService QuestionImportService { get; }
+    public QuestionExportService QuestionExportService { get; }
 
     public QuizEvaluationService QuizEvaluationService { get; }
 
@@ -31,10 +32,11 @@ public partial class App : Application
 
         LocalizationService = new LocalizationService();
         QuestionImportService = new QuestionImportService();
+        QuestionExportService = new QuestionExportService();
         QuizEvaluationService = new QuizEvaluationService();
         ThemeService = new ThemeService();
 
-        QuizViewModel = new QuizViewModel(LocalizationService, QuestionImportService, QuizEvaluationService);
+        QuizViewModel = new QuizViewModel(LocalizationService, QuestionImportService, QuestionExportService, QuizEvaluationService);
         SettingsViewModel = new SettingsViewModel(LocalizationService, ThemeService);
     }
 

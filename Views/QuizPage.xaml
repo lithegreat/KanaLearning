@@ -58,7 +58,14 @@
             <StackPanel Spacing="16">
                 <TextBlock FontSize="24" FontWeight="Bold" Text="{Binding ManualInputTitleText}" />
                 
-                <Button Click="OnImportButtonClick" Content="{Binding ImportButtonText}" HorizontalAlignment="Stretch" />
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Click="OnImportButtonClick" Content="{Binding ImportButtonText}" HorizontalAlignment="Stretch" />
+                    <Button Grid.Column="1" Click="OnExportButtonClick" Content="{Binding ExportButtonText}" HorizontalAlignment="Stretch" />
+                </Grid>
                 <TextBlock Text="{Binding ImportHintText}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
 
                 <MenuFlyoutSeparator Margin="0,8" />

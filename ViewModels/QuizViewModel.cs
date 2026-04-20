@@ -17,6 +17,7 @@ public partial class QuizViewModel : ObservableObject
 {
     private readonly ILocalizationService _localizationService;
     private readonly IQuestionImportService _questionImportService;
+    private readonly IQuestionExportService _questionExportService;
     private readonly IQuizEvaluationService _quizEvaluationService;
     private readonly Random _random = new();
     private readonly List<KanaQuestion> _allQuestions = new();
@@ -24,10 +25,12 @@ public partial class QuizViewModel : ObservableObject
     public QuizViewModel(
         ILocalizationService localizationService,
         IQuestionImportService questionImportService,
+        IQuestionExportService questionExportService,
         IQuizEvaluationService quizEvaluationService)
     {
         _localizationService = localizationService;
         _questionImportService = questionImportService;
+        _questionExportService = questionExportService;
         _quizEvaluationService = quizEvaluationService;
 
         _localizationService.LanguageChanged += OnLanguageChanged;
@@ -100,6 +103,8 @@ public partial class QuizViewModel : ObservableObject
 
     public string ImportButtonText => _localizationService.GetString("Quiz.Import");
 
+    public string ExportButtonText => _localizationService.GetString("Quiz.Export");
+
     public string AddButtonText => _localizationService.GetString("Quiz.AddQuestion");
 
     public string ResetButtonText => _localizationService.GetString("Quiz.Reset");
@@ -164,9 +169,15 @@ public partial class QuizViewModel : ObservableObject
         if (isCorrect)
         {
             CorrectCount++;
-            FeedbackMessage = string.Format(
+            string message = string.Format(
                 _localizationService.GetString("Quiz.Feedback.Correct"),
                 CurrentQuestion.Romaji);
+            
+            // Automatically move to next question if correct
+            SelectNextQuestion();
+
+            // Set message AFTER SelectNextQuestion because SelectNextQuestion clears it
+            FeedbackMessage = message;
         }
         else
         {
@@ -181,6 +192,7 @@ public partial class QuizViewModel : ObservableObject
     [RelayCommand]
     private void NextQuestion()
     {
+        FeedbackMessage = string.Empty;
         SelectNextQuestion();
     }
 
@@ -236,7 +248,7 @@ public partial class QuizViewModel : ObservableObject
 
     public async Task ImportFromPathAsync(string path)
     {
-        var result = await _questionImportService.ImportFromPathAsync(path).ConfigureAwait(false);
+        var result = await _questionImportService.ImportFromPathAsync(path);
 
         if (result.Questions.Count == 0)
         {
@@ -271,6 +283,19 @@ public partial class QuizViewModel : ObservableObject
         OnPropertyChanged(nameof(FilteredCountText));
     }
 
+    public async Task ExportToPathAsync(string path)
+    {
+        try
+        {
+            await _questionExportService.ExportToPathAsync(path, _allQuestions);
+            BankFeedbackMessage = _localizationService.GetString("Quiz.Feedback.ExportSuccess");
+        }
+        catch (IOException)
+        {
+            BankFeedbackMessage = _localizationService.GetString("Quiz.Feedback.ExportError");
+        }
+    }
+
     partial void OnIncludeHiraganaChanged(bool value)
     {
         OnFilterChanged();
@@ -287,6 +312,14 @@ public partial class QuizViewModel : ObservableObject
         SelectNextQuestion();
     }
 
+    partial void OnUserAnswerChanged(string value)
+    {
+        if (!string.IsNullOrEmpty(value))
+        {
+            FeedbackMessage = string.Empty;
+        }
+    }
+
     private void SelectNextQuestion()
     {
         List<KanaQuestion> filtered = GetFilteredQuestions();
@@ -299,6 +332,7 @@ public partial class QuizViewModel : ObservableObject
         int index = _random.Next(filtered.Count);
         CurrentQuestion = filtered[index];
         UserAnswer = string.Empty;
+        FeedbackMessage = string.Empty;
     }
 
     private List<KanaQuestion> GetFilteredQuestions()

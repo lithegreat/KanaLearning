@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Storage.Pickers;
@@ -51,11 +52,38 @@ public sealed partial class QuizPage : Page
         await ViewModel.ImportFromPathAsync(file.Path);
     }
 
+    private async void OnExportButtonClick(object sender, RoutedEventArgs e)
+    {
+        FileSavePicker picker = new();
+        picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+        picker.FileTypeChoices.Add("JSON File", new List<string>() { ".json" });
+        picker.SuggestedFileName = "kana-questions";
+
+        IntPtr hwnd = WindowNative.GetWindowHandle(App.CurrentApp.MainWindow);
+        InitializeWithWindow.Initialize(picker, hwnd);
+
+        var file = await picker.PickSaveFileAsync();
+        if (file is null)
+        {
+            return;
+        }
+
+        await ViewModel.ExportToPathAsync(file.Path);
+    }
+
     private void OnAnswerTextBoxKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
     {
         if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            if (ViewModel.SubmitAnswerCommand.CanExecute(null))
+            if (ViewModel.HasFeedback)
+            {
+                if (ViewModel.NextQuestionCommand.CanExecute(null))
+                {
+                    ViewModel.NextQuestionCommand.Execute(null);
+                    e.Handled = true;
+                }
+            }
+            else if (ViewModel.SubmitAnswerCommand.CanExecute(null))
             {
                 ViewModel.SubmitAnswerCommand.Execute(null);
                 e.Handled = true;
