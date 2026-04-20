@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using KanaLearning.Services;
 using KanaLearning.UIServices;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace KanaLearning.ViewModels;
 
@@ -73,6 +74,8 @@ public partial class SettingsViewModel : ObservableObject
 
     public string DescriptionText => _localizationService.GetString("Settings.Description");
 
+    public string UpdateText => _localizationService.GetString("Settings.Update");
+
     partial void OnSelectedLanguageChanged(LanguageOption? value)
     {
         if (_isUpdating || value is null)
@@ -111,6 +114,7 @@ public partial class SettingsViewModel : ObservableObject
             OnPropertyChanged(nameof(LanguageText));
             OnPropertyChanged(nameof(ThemeText));
             OnPropertyChanged(nameof(DescriptionText));
+            OnPropertyChanged(nameof(UpdateText));
         }
         finally
         {
@@ -172,6 +176,12 @@ public partial class SettingsViewModel : ObservableObject
         }
 
         SelectedTheme = _themeSystemOption;
+    }
+
+    [CommunityToolkit.Mvvm.Input.RelayCommand]
+    private void CheckForUpdates()
+    {
+        WeakReferenceMessenger.Default.Send(new KanaLearning.Messages.CheckForUpdateMessage());
     }
 }
 
