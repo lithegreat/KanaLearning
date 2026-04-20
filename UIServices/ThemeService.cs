@@ -43,20 +43,45 @@ public sealed class ThemeService : IThemeService
         }
     }
 
+    private string GetSettingsFilePath()
+    {
+        string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string appFolder = System.IO.Path.Combine(localAppData, "KanaLearning");
+        System.IO.Directory.CreateDirectory(appFolder);
+        return System.IO.Path.Combine(appFolder, "theme.txt");
+    }
+
     private ElementTheme LoadThemeFromSettings()
     {
-        if (ApplicationData.Current.LocalSettings.Values.TryGetValue(ThemeKey, out object? value) && value is string themeString)
+        try
         {
-            if (Enum.TryParse(themeString, out ElementTheme theme))
+            string filePath = GetSettingsFilePath();
+            if (System.IO.File.Exists(filePath))
             {
-                return theme;
+                string themeString = System.IO.File.ReadAllText(filePath);
+                if (Enum.TryParse(themeString, out ElementTheme theme))
+                {
+                    return theme;
+                }
             }
+        }
+        catch
+        {
+            // Ignore errors
         }
         return ElementTheme.Default;
     }
 
     private void SaveThemeToSettings(ElementTheme theme)
     {
-        ApplicationData.Current.LocalSettings.Values[ThemeKey] = theme.ToString();
+        try
+        {
+            string filePath = GetSettingsFilePath();
+            System.IO.File.WriteAllText(filePath, theme.ToString());
+        }
+        catch
+        {
+            // Ignore errors
+        }
     }
 }
