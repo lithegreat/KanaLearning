@@ -50,4 +50,28 @@ public sealed partial class QuizPage : Page
 
         await ViewModel.ImportFromPathAsync(file.Path);
     }
+
+    private void OnAnswerTextBoxKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            if (ViewModel.SubmitAnswerCommand.CanExecute(null))
+            {
+                ViewModel.SubmitAnswerCommand.Execute(null);
+                e.Handled = true;
+            }
+        }
+    }
+
+    private void OnManualKanaTextBoxKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            if (ViewModel.AddQuestionCommand.CanExecute(null))
+            {
+                ViewModel.AddQuestionCommand.Execute(null);
+                e.Handled = true;
+            }
+        }
+    }
 }

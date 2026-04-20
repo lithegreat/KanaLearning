@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using KanaLearning.Core.Services;
 using KanaLearning.Models;
 using KanaLearning.Services;
 
@@ -36,8 +37,6 @@ public partial class QuizViewModel : ObservableObject
 
         IncludeHiragana = true;
         IncludeKatakana = true;
-        IncludeDakutenHandakuten = true;
-        IncludeYoon = true;
 
         LoadDefaultQuestions();
         SelectNextQuestion();
@@ -53,6 +52,9 @@ public partial class QuizViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasFeedback))]
     private string _feedbackMessage = string.Empty;
+
+    [ObservableProperty]
+    private string _bankFeedbackMessage = string.Empty;
 
     [ObservableProperty]
     private string _userAnswer = string.Empty;
@@ -75,18 +77,7 @@ public partial class QuizViewModel : ObservableObject
     private bool _includeKatakana;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(FilteredCountText))]
-    private bool _includeDakutenHandakuten;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(FilteredCountText))]
-    private bool _includeYoon;
-
-    [ObservableProperty]
     private string _manualKana = string.Empty;
-
-    [ObservableProperty]
-    private string _manualRomaji = string.Empty;
 
     [ObservableProperty]
     private CategoryOption? _selectedManualCategory;
@@ -128,10 +119,6 @@ public partial class QuizViewModel : ObservableObject
     public string FilterHiraganaText => _localizationService.GetString("Quiz.Filter.Hiragana");
 
     public string FilterKatakanaText => _localizationService.GetString("Quiz.Filter.Katakana");
-
-    public string FilterDakutenText => _localizationService.GetString("Quiz.Filter.Dakuten");
-
-    public string FilterYoonText => _localizationService.GetString("Quiz.Filter.Yoon");
 
     public bool HasFeedback => !string.IsNullOrWhiteSpace(FeedbackMessage);
 
@@ -200,17 +187,26 @@ public partial class QuizViewModel : ObservableObject
     [RelayCommand]
     private void AddQuestion()
     {
-        if (string.IsNullOrWhiteSpace(ManualKana) || string.IsNullOrWhiteSpace(ManualRomaji))
+        if (string.IsNullOrWhiteSpace(ManualKana))
         {
-            FeedbackMessage = _localizationService.GetString("Quiz.Feedback.InvalidManualInput");
+            BankFeedbackMessage = _localizationService.GetString("Quiz.Feedback.InvalidManualInput");
+            return;
+        }
+        
+        string kana = ManualKana.Trim();
+        string? romaji = KanaMapper.GetRomaji(kana);
+        
+        if (string.IsNullOrEmpty(romaji))
+        {
+            BankFeedbackMessage = _localizationService.GetString("Quiz.Feedback.InvalidManualInput");
             return;
         }
 
         KanaCategory category = SelectedManualCategory?.Category ?? KanaCategory.Hiragana;
         KanaQuestion newQuestion = new()
         {
-            Kana = ManualKana.Trim(),
-            Romaji = ManualRomaji.Trim(),
+            Kana = kana,
+            Romaji = romaji,
             Category = category,
         };
 
@@ -218,14 +214,13 @@ public partial class QuizViewModel : ObservableObject
                 string.Equals(q.Kana, newQuestion.Kana, StringComparison.Ordinal) &&
                 string.Equals(q.Romaji, newQuestion.Romaji, StringComparison.OrdinalIgnoreCase)))
         {
-            FeedbackMessage = _localizationService.GetString("Quiz.Feedback.Duplicate");
+            BankFeedbackMessage = _localizationService.GetString("Quiz.Feedback.Duplicate");
             return;
         }
 
         _allQuestions.Add(newQuestion);
         ManualKana = string.Empty;
-        ManualRomaji = string.Empty;
-        FeedbackMessage = _localizationService.GetString("Quiz.Feedback.ManualAdded");
+        BankFeedbackMessage = _localizationService.GetString("Quiz.Feedback.ManualAdded");
         SelectNextQuestion();
         OnPropertyChanged(nameof(FilteredCountText));
     }
@@ -245,7 +240,7 @@ public partial class QuizViewModel : ObservableObject
 
         if (result.Questions.Count == 0)
         {
-            FeedbackMessage = result.Errors.Count > 0
+            BankFeedbackMessage = result.Errors.Count > 0
                 ? result.Errors[0]
                 : _localizationService.GetString("Quiz.Feedback.ImportEmpty");
             return;
@@ -267,11 +262,11 @@ public partial class QuizViewModel : ObservableObject
 
         if (added == 0)
         {
-            FeedbackMessage = _localizationService.GetString("Quiz.Feedback.DuplicateImport");
+            BankFeedbackMessage = _localizationService.GetString("Quiz.Feedback.DuplicateImport");
             return;
         }
 
-        FeedbackMessage = string.Format(_localizationService.GetString("Quiz.Feedback.ImportSuccess"), added);
+        BankFeedbackMessage = string.Format(_localizationService.GetString("Quiz.Feedback.ImportSuccess"), added);
         SelectNextQuestion();
         OnPropertyChanged(nameof(FilteredCountText));
     }
@@ -282,16 +277,6 @@ public partial class QuizViewModel : ObservableObject
     }
 
     partial void OnIncludeKatakanaChanged(bool value)
-    {
-        OnFilterChanged();
-    }
-
-    partial void OnIncludeDakutenHandakutenChanged(bool value)
-    {
-        OnFilterChanged();
-    }
-
-    partial void OnIncludeYoonChanged(bool value)
     {
         OnFilterChanged();
     }
@@ -320,10 +305,14 @@ public partial class QuizViewModel : ObservableObject
     {
         return _allQuestions
             .Where(question =>
-                (IncludeHiragana && question.Category == KanaCategory.Hiragana) ||
-                (IncludeKatakana && question.Category == KanaCategory.Katakana) ||
-                (IncludeDakutenHandakuten && question.Category == KanaCategory.DakutenHandakuten) ||
-                (IncludeYoon && question.Category == KanaCategory.Yoon))
+            {
+                if (string.IsNullOrEmpty(question.Kana)) return false;
+                char firstChar = question.Kana[0];
+                bool isHiragana = firstChar >= '\u3040' && firstChar <= '\u309F';
+                bool isKatakana = firstChar >= '\u30A0' && firstChar <= '\u30FF';
+
+                return (IncludeHiragana && isHiragana) || (IncludeKatakana && isKatakana);
+            })
             .ToList();
     }
 
@@ -381,16 +370,7 @@ public partial class QuizViewModel : ObservableObject
             Category = KanaCategory.Katakana,
             DisplayName = _localizationService.GetString("Category.Katakana"),
         });
-        CategoryOptions.Add(new CategoryOption
-        {
-            Category = KanaCategory.DakutenHandakuten,
-            DisplayName = _localizationService.GetString("Category.Dakuten"),
-        });
-        CategoryOptions.Add(new CategoryOption
-        {
-            Category = KanaCategory.Yoon,
-            DisplayName = _localizationService.GetString("Category.Yoon"),
-        });
+
 
         CategoryOption? match = CategoryOptions.FirstOrDefault(c => c.Category == selectedCategory);
         SelectedManualCategory = match ?? CategoryOptions.FirstOrDefault();
