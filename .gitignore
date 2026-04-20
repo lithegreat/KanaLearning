@@ -1,0 +1,28 @@
+# Build artifacts
+bin/
+obj/
+
+# Publish/package artifacts
+publish*/
+*.zip
+
+# Logs
+*.log
+xaml.err.log
+xaml.out.log
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Test results
+TestResults/
+
+# NuGet
+*.nupkg
+*.snupkg

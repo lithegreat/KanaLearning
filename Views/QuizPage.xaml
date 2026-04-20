@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="KanaLearning.Views.QuizPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Padding="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" FontSize="24" FontWeight="Bold" Text="{Binding PageTitleText}" />
+        <TextBlock Grid.Row="1" Margin="0,8,0,0" FontSize="48" Text="{Binding CurrentKanaText}" />
+        <TextBox Grid.Row="2" Margin="0,12,0,0" Header="{Binding AnswerLabelText}" Text="{Binding UserAnswer, Mode=TwoWay}" />
+
+        <StackPanel Grid.Row="3" Margin="0,8,0,0" Orientation="Horizontal" Spacing="8">
+            <Button Command="{Binding SubmitAnswerCommand}" Content="{Binding SubmitButtonText}" />
+            <Button Command="{Binding NextQuestionCommand}" Content="{Binding NextButtonText}" />
+            <Button Command="{Binding ResetSessionCommand}" Content="{Binding ResetButtonText}" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="4" Margin="0,8,0,0" Text="{Binding ProgressText}" />
+        <TextBlock Grid.Row="5" Text="{Binding AccuracyText}" />
+        <TextBlock Grid.Row="6" Text="{Binding FeedbackMessage}" TextWrapping="Wrap" />
+
+        <Button Grid.Row="7" Margin="0,12,0,0" Click="OnImportButtonClick" Content="{Binding ImportButtonText}" />
+
+        <TextBox Grid.Row="8" Margin="0,8,0,0" Header="{Binding ManualKanaLabelText}" Text="{Binding ManualKana, Mode=TwoWay}" />
+        <TextBox Grid.Row="9" Margin="0,8,0,0" Header="{Binding ManualRomajiLabelText}" Text="{Binding ManualRomaji, Mode=TwoWay}" />
+        <Button Grid.Row="10" Margin="0,12,0,0" VerticalAlignment="Top" Command="{Binding AddQuestionCommand}" Content="{Binding AddButtonText}" />
+    </Grid>
+</Page>

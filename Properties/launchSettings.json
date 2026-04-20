@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "KanaLearning (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "KanaLearning (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

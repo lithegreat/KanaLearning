@@ -1,0 +1,22 @@
+[
+  { "kana": "あ", "romaji": "a", "category": "Hiragana" },
+  { "kana": "い", "romaji": "i", "category": "Hiragana" },
+  { "kana": "う", "romaji": "u", "category": "Hiragana" },
+  { "kana": "え", "romaji": "e", "category": "Hiragana" },
+  { "kana": "お", "romaji": "o", "category": "Hiragana" },
+  { "kana": "カ", "romaji": "ka", "category": "Katakana" },
+  { "kana": "キ", "romaji": "ki", "category": "Katakana" },
+  { "kana": "ク", "romaji": "ku", "category": "Katakana" },
+  { "kana": "ケ", "romaji": "ke", "category": "Katakana" },
+  { "kana": "コ", "romaji": "ko", "category": "Katakana" },
+  { "kana": "が", "romaji": "ga", "category": "DakutenHandakuten" },
+  { "kana": "ぎ", "romaji": "gi", "category": "DakutenHandakuten" },
+  { "kana": "ぐ", "romaji": "gu", "category": "DakutenHandakuten" },
+  { "kana": "ぱ", "romaji": "pa", "category": "DakutenHandakuten" },
+  { "kana": "ぴ", "romaji": "pi", "category": "DakutenHandakuten" },
+  { "kana": "きゃ", "romaji": "kya", "category": "Yoon" },
+  { "kana": "きゅ", "romaji": "kyu", "category": "Yoon" },
+  { "kana": "きょ", "romaji": "kyo", "category": "Yoon" },
+  { "kana": "シャ", "romaji": "sha", "category": "Yoon" },
+  { "kana": "シュ", "romaji": "shu", "category": "Yoon" }
+]
