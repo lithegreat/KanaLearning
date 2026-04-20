@@ -47,40 +47,40 @@ public partial class QuizViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CurrentKanaText))]
     [NotifyPropertyChangedFor(nameof(HasCurrentQuestion))]
-    private KanaQuestion? _currentQuestion;
+    public partial KanaQuestion? CurrentQuestion { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasFeedback))]
-    private string _feedbackMessage = string.Empty;
+    public partial string FeedbackMessage { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _bankFeedbackMessage = string.Empty;
+    public partial string BankFeedbackMessage { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _userAnswer = string.Empty;
+    public partial string UserAnswer { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ProgressText))]
     [NotifyPropertyChangedFor(nameof(AccuracyText))]
-    private int _attemptedCount;
+    public partial int AttemptedCount { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(AccuracyText))]
-    private int _correctCount;
+    public partial int CorrectCount { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(FilteredCountText))]
-    private bool _includeHiragana;
+    public partial bool IncludeHiragana { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(FilteredCountText))]
-    private bool _includeKatakana;
+    public partial bool IncludeKatakana { get; set; }
 
     [ObservableProperty]
-    private string _manualKana = string.Empty;
+    public partial string ManualKana { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private CategoryOption? _selectedManualCategory;
+    public partial CategoryOption? SelectedManualCategory { get; set; }
 
     public string PageTitleText => _localizationService.GetString("Quiz.Title");
 

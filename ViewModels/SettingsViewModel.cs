@@ -61,10 +61,10 @@ public partial class SettingsViewModel : ObservableObject
     public ObservableCollection<ThemeOption> ThemeOptions { get; }
 
     [ObservableProperty]
-    private LanguageOption? _selectedLanguage;
+    public partial LanguageOption? SelectedLanguage { get; set; }
 
     [ObservableProperty]
-    private ThemeOption? _selectedTheme;
+    public partial ThemeOption? SelectedTheme { get; set; }
 
     public string TitleText => _localizationService.GetString("Settings.Title");
 
