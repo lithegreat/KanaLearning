@@ -23,5 +23,17 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
+
+        <ComboBox
+            AutomationProperties.Name="Theme"
+            Header="{Binding ThemeText}"
+            ItemsSource="{Binding ThemeOptions}"
+            SelectedItem="{Binding SelectedTheme, Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding DisplayName}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
     </StackPanel>
 </Page>
