@@ -47,9 +47,10 @@ jobs:
           -p:DisablePackagingForTestBuild=true
           -p:PublishProfile=
           -p:EnableMsixTooling=false
-          --verbosity quiet
+          --verbosity normal
           --nologo
-          --logger "console;verbosity=minimal"
+          --logger "console;verbosity=detailed"
+          --blame-hang-timeout 60s
 
       - name: Upload optional PDB artifact
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_pdb_artifact == 'true' }}
