@@ -1,8 +1,11 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace KanaLearning.ViewModels;
 
-public sealed class LanguageOption
+public sealed partial class LanguageOption : ObservableObject
 {
     public required string Code { get; init; }
 
-    public required string DisplayName { get; init; }
+    [ObservableProperty]
+    private string _displayName = string.Empty;
 }
