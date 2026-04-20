@@ -39,18 +39,47 @@ jobs:
           restore-keys: |
             nuget-${{ runner.os }}-
 
-      - name: Build and test (Debug x64)
-        run: >-
-          dotnet test .\KanaLearning.Tests\KanaLearning.Tests.csproj
-          -c Debug
-          -p:Platform=x64
-          -p:DisablePackagingForTestBuild=true
-          -p:PublishProfile=
-          -p:EnableMsixTooling=false
-          --verbosity normal
-          --nologo
-          --logger "console;verbosity=detailed"
-          --blame-hang-timeout 60s
+      - name: Restore
+        run: dotnet restore .\KanaLearning.Tests\KanaLearning.Tests.csproj -p:DisablePackagingForTestBuild=true -p:PublishProfile= -p:EnableMsixTooling=false --nologo
+
+      - name: Build (Debug x64)
+        run: dotnet build .\KanaLearning.Tests\KanaLearning.Tests.csproj -c Debug -p:Platform=x64 -p:DisablePackagingForTestBuild=true -p:PublishProfile= -p:EnableMsixTooling=false --no-restore --nologo
+
+      - name: Test (Debug x64)
+        run: |
+          Write-Host "::group::Test host startup"
+          Write-Host "Test start: $(Get-Date -Format 'HH:mm:ss.fff')"
+          dotnet test .\KanaLearning.Tests\KanaLearning.Tests.csproj `
+            -c Debug `
+            -p:Platform=x64 `
+            -p:DisablePackagingForTestBuild=true `
+            -p:PublishProfile= `
+            -p:EnableMsixTooling=false `
+            --no-build `
+            --nologo `
+            --logger "console;verbosity=detailed" `
+            --logger "trx;LogFileName=results.trx"
+          Write-Host "Test end: $(Get-Date -Format 'HH:mm:ss.fff')"
+          Write-Host "::endgroup::"
+
+      - name: Show test timing
+        if: always()
+        run: |
+          $trx = Get-ChildItem -Recurse -Filter results.trx -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($trx) {
+            [xml]$xml = Get-Content $trx.FullName
+            Write-Host "=== Test Run Timing ==="
+            Write-Host "creation : $($xml.TestRun.Times.creation)"
+            Write-Host "start    : $($xml.TestRun.Times.start)"
+            Write-Host "finish   : $($xml.TestRun.Times.finish)"
+            Write-Host ""
+            Write-Host "=== Per-Test Results ==="
+            $xml.TestRun.Results.UnitTestResult | ForEach-Object {
+              Write-Host "$($_.outcome.PadRight(8)) $($_.duration) $($_.testName)"
+            }
+          } else {
+            Write-Host "No .trx file found — tests may have crashed before producing results."
+          }
 
       - name: Upload optional PDB artifact
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_pdb_artifact == 'true' }}
