@@ -59,6 +59,19 @@
     <None Remove="KanaLearning.Tests\**\*" />
     <Page Remove="KanaLearning.Tests\**\*.xaml" />
     <EmbeddedResource Remove="KanaLearning.Tests\**\*" />
+
+    <!-- Prevent local publish artifacts from being included in app publish outputs -->
+    <Compile Remove="publish*\**\*" />
+    <None Remove="publish*\**\*" />
+    <Content Remove="publish*\**\*" />
+    <Page Remove="publish*\**\*" />
+    <EmbeddedResource Remove="publish*\**\*" />
+
+    <Compile Remove="artifacts\**\*" />
+    <None Remove="artifacts\**\*" />
+    <Content Remove="artifacts\**\*" />
+    <Page Remove="artifacts\**\*" />
+    <EmbeddedResource Remove="artifacts\**\*" />
   </ItemGroup>
 
   <!--

@@ -8,6 +8,15 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      upload_pdb_artifact:
+        description: Upload PDB as internal artifact
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 jobs:
   build-and-test:
@@ -33,3 +42,13 @@ jobs:
 
       - name: Run tests (Debug x64)
         run: dotnet test .\KanaLearning.Tests\KanaLearning.Tests.csproj -c Debug -p:Platform=x64 --verbosity normal
+
+      - name: Upload optional PDB artifact
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_pdb_artifact == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: KanaLearning-pdb-debug-${{ github.run_id }}
+          path: |
+            **/bin/**/Debug/**/KanaLearning.pdb
+          if-no-files-found: warn
+          retention-days: 7

@@ -49,15 +49,22 @@ jobs:
       - name: Publish app (Release win-x64)
         shell: pwsh
         run: |
+          if (Test-Path .\artifacts\publish\win-x64) {
+            Remove-Item .\artifacts\publish\win-x64 -Recurse -Force
+          }
           dotnet publish .\KanaLearning.csproj `
             -c Release `
             -r win-x64 `
             -p:Platform=x64 `
             -p:WindowsPackageType=None `
             -p:SelfContained=true `
-            -p:WindowsAppSDKSelfContained=false `
+            -p:WindowsAppSDKSelfContained=true `
             -p:PublishTrimmed=false `
             -p:PublishReadyToRun=false `
+            -p:DebugSymbols=false `
+            -p:DebugType=None `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
             -o .\artifacts\publish\win-x64
 
       - name: Validate publish output
@@ -66,9 +73,10 @@ jobs:
           if (-not (Test-Path .\artifacts\publish\win-x64\KanaLearning.exe)) {
             throw "Publish output is missing KanaLearning.exe"
           }
-          if (-not (Test-Path .\artifacts\publish\win-x64\Resources)) {
-            throw "Publish output is missing Resources folder"
+          if (Test-Path .\artifacts\publish\win-x64\KanaLearning.pdb) {
+            throw "Publish output should not include KanaLearning.pdb"
           }
+          Get-ChildItem .\artifacts\publish\win-x64 | Select-Object Name, Length
 
       - name: Archive publish output
         shell: pwsh
@@ -76,7 +84,7 @@ jobs:
           New-Item -ItemType Directory -Path .\artifacts\release -Force | Out-Null
           $zipPath = ".\artifacts\release\${{ steps.vars.outputs.zip_name }}"
           if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-          Compress-Archive -Path .\artifacts\publish\win-x64\* -DestinationPath $zipPath -Force
+          Compress-Archive -Path .\artifacts\publish\win-x64\KanaLearning.exe -DestinationPath $zipPath -Force
           Get-Item $zipPath | Select-Object FullName, Length, LastWriteTime
 
       - name: Upload workflow artifact
@@ -96,5 +104,5 @@ jobs:
           body: |
             Runtime notes:
             - Target OS: Windows x64
-            - If app does not launch, install Windows App SDK Runtime first.
+            - Published as single-file self-contained package to reduce DLL clutter.
           overwrite_files: true
