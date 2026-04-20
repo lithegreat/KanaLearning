@@ -1,5 +1,6 @@
 using System;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using KanaLearning.Services;
 using KanaLearning.ViewModels;
 using KanaLearning.Views;
@@ -30,22 +31,25 @@ public sealed partial class MainWindow : Window
 
         AppWindow.SetIcon("Assets/AppIcon.ico");
         UpdateShellTexts();
+        NavView.SelectedItem = QuizNavButton;
         ContentFrame.Navigate(typeof(QuizPage), _quizViewModel);
     }
 
-    private void OnQuizNavButtonClick(object sender, RoutedEventArgs e)
+    private void OnNavItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
-        if (ContentFrame.Content is not QuizPage)
+        if (args.InvokedItemContainer == QuizNavButton)
         {
-            ContentFrame.Navigate(typeof(QuizPage), _quizViewModel);
+            if (ContentFrame.Content is not QuizPage)
+            {
+                ContentFrame.Navigate(typeof(QuizPage), _quizViewModel);
+            }
         }
-    }
-
-    private void OnSettingsNavButtonClick(object sender, RoutedEventArgs e)
-    {
-        if (ContentFrame.Content is not SettingsPage)
+        else if (args.InvokedItemContainer == SettingsNavButton)
         {
-            ContentFrame.Navigate(typeof(SettingsPage), _settingsViewModel);
+            if (ContentFrame.Content is not SettingsPage)
+            {
+                ContentFrame.Navigate(typeof(SettingsPage), _settingsViewModel);
+            }
         }
     }
 
